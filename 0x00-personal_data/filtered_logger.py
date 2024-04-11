@@ -81,3 +81,29 @@ def create_user_data_logger() -> logging.Logger:
     logger.addHandler(target_handler)
     
     return logger
+
+def main() -> None:
+    """
+    Main function that retrieves user data from a database, formats it, and logs it with redacted PII.
+    """
+    db = get_db()
+    cur = db.cursor()
+
+    query = ('SELECT * FROM users;')
+    cur.execute(query)
+    fetch_data = cur.fetchall()
+
+    logger = get_logger()
+
+    for row in fetch_data:
+        fields = 'name={}; email={}; phone={}; ssn={}; password={}; ip={}; '\
+            'last_login={}; user_agent={};'
+        fields = fields.format(row[0], row[1], row[2], row[3],
+                               row[4], row[5], row[6], row[7])
+        logger.info(fields)
+
+    cur.close()
+    db.close()
+
+if __name__ == "__main__":
+    main()
