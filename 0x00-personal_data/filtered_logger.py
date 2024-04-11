@@ -4,6 +4,8 @@ This script filters personal information (PII) from log messages using regular
 expressions and environmental variables.
 It retrieves data from a MySQL database and logs it with redacted PII fields.
 """
+
+
 import re
 from typing import List
 import logging
@@ -19,26 +21,27 @@ class RedactingFormatter(logging.Formatter):
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-
     def __init__(self, fields: List[str]):
-         """
-         nitializes the RedactingFormatter with a list of fields to redact.
-         """
-         self.fields = fields
-         super(RedactingFormatter, self).__init__(self.FORMAT)
+        """
+        nitializes the RedactingFormatter with a list of fields to redact.
+        """
+        self.fields = fields
+        super(RedactingFormatter, self).__init__(self.FORMAT)
 
     def format(self, record: logging.LogRecord) -> str:
         """
-        Formats a log record by filtering values using the configured fields and redacting them.
+        Formats a log record by filtering values using and redacting them.
         """
         result = logging.Formatter(self.FORMAT).format(record)
         return filter_datum(
-        self.fields,
-        self.REDACTION,
-        result,
-        self.SEPARATOR)
+                self.fields,
+                self.REDACTION,
+                result,
+                self.SEPARATOR)
+
 
 PII_FIELDS = ('name', 'email', 'password', 'ssn', 'phone')
+
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """
@@ -52,17 +55,19 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     )
     return db_connect
 
+
 def filter_datum(fields: List[str],
-         redaction: str,
-         message: str,
-         separator: str) -> str:
+                 redaction: str,
+                 message: str,
+                 separator: str) -> str:
     """
-    Filters a log message by replacing occurrences of PII fields with a red
+    Returns the log with Regex
     """
     for item in fields:
         message = re.sub(item + '=.*?' + separator, item + '=' +
-                redaction + separator, message)
-     return message
+                         redaction + separator, message)
+    return message
+
 
 def create_user_data_logger() -> logging.Logger:
     """
@@ -79,12 +84,13 @@ def create_user_data_logger() -> logging.Logger:
     target_handler.setFormatter(formatter)
 
     logger.addHandler(target_handler)
-    
+
     return logger
+
 
 def main() -> None:
     """
-    Main function that retrieves user data from a database, formats it, and logs it with redacted PII.
+    Main data from a database, formats it, and logs it with redacted PII.
     """
     db = get_db()
     cur = db.cursor()
@@ -104,6 +110,7 @@ def main() -> None:
 
     cur.close()
     db.close()
+
 
 if __name__ == "__main__":
     main()
