@@ -14,32 +14,33 @@ import os
 
 
 class RedactingFormatter(logging.Formatter):
-    def __init__(self, fields):
-        super().__init__()
-        self.fields = set(fields)
+    """
+    Formatter class for redacting PII fields in log messages.
+    """
+    REDACTION = "***"
+    FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
+    SEPARATOR = ";"
 
-    def format(self, record):
-        for field in self.fields:
-            if hasattr(record, "args") and field in record.args:
-                record.args[field] = "[REDACTED]"
-        return super().format(record)
+    def __init__(self, fields: List[str]):
+        """
+        nitializes the RedactingFormatter with a list of fields to redact.
+        """
+        self.fields = fields
+        super(RedactingFormatter, self).__init__(self.FORMAT)
 
-def get_logger():
-    logger = logging.getLogger("user_data")
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-
-    stream_handler = logging.StreamHandler()
-    pii_fields = ("name", "email", "phone", "address", "credit_card")
-    formatter = RedactingFormatter(pii_fields)
-    stream_handler.setFormatter(formatter)
-
-    logger.addHandler(stream_handler)
-
-    return logger
+    def format(self, record: logging.LogRecord) -> str:
+        """
+        Formats a log record by filtering values using and redacting them.
+        """
+        result = logging.Formatter(self.FORMAT).format(record)
+        return filter_datum(
+                self.fields,
+                self.REDACTION,
+                result,
+                self.SEPARATOR)
 
 
-PII_FIELDS = ("name", "email", "phone", "address", "credit_card")
+PII_FIELDS = ('name', 'email', 'password', 'ssn', 'phone')
 
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
