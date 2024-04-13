@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Main file demonstrating secure password hashing with bcrypt.
+Encrypt password file
 """
 
 import bcrypt
 
 
 def hash_password(password: str) -> bytes:
-    """Hashes a password using bcrypt with random salt.
     """
+    Hashes a password using bcrypt.
+    """
+    # Generate a salt and hash the password
     salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode(), salt)
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed_password
 
 
-def is_valid(hashed_password: bytes, password: str) -> bool:
-    """provided password matches the stored hashed password using bcrypt.
-    """
-   return bcrypt.checkpw(password.encode(), hashed_password)
+if __name__ == "__main__":
+    password = "MyAmazingPassw0rd"
+    print(hash_password(password).decode('utf-8'))
