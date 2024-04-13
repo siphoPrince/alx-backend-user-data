@@ -101,7 +101,8 @@ def main() -> None:
     with open("user_data.csv", newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            fields = '; '.join([f"{key}={value}" for key, value in row.items()])
+            fields = '; '.join(
+                    [f"{key}={value}" for key, value in row.items()])
             logger.info(fields)
 
 
