@@ -74,19 +74,6 @@ def create_user_data_logger() -> logging.Logger:
     return logger
 
 
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """
-    Establishes a connection to the MySQL database using environment variables.
-    """
-    db_connect = mysql.connector.connect(
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
-        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
-        database=os.getenv('PERSONAL_DATA_DB_NAME', 'my_db')
-    )
-    return db_connect
-
-
 def get_logger() -> logging.Logger:
     """
     Creates and configures a logger for user data processing.
