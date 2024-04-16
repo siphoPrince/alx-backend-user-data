@@ -7,6 +7,8 @@ from os import getenv
 from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
 from flask_cors import (CORS, cross_origin)
+from api.v1.auth.auth import Auth
+from api.v1.auth.basic_auth import BasicAuth
 import os
 
 
@@ -17,38 +19,32 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 auth = None
 
 if os.getenv('AUTH_TYPE') == 'auth':
-    from api.v1.auth.auth import Auth
     auth = Auth()
 elif os.getenv('AUTH_TYPE') == 'basic_auth':
-    from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
 
 
 @app.errorhandler(404)
-def not_found(error) -> str:
-    """ Not found handler
-    """
+def not_found(error):
+    """ error not found page """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(401)
 def unauthorized_error(error) -> str:
-    """ Unauthorized handler
-    """
+    """ 401 unauthorized page """
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden_error(error) -> str:
-    """ Forbidden handler
-    """
+    """ 403 page forbidden """
     return jsonify({"error": "Forbidden"}), 403
 
 
 @app.before_request
 def before_request() -> str:
-    """ Filter each request
-    """
+    """ checks before each request """
     request_path_list = [
         '/api/v1/status/',
         '/api/v1/unauthorized/',
