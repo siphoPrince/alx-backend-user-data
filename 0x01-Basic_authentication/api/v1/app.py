@@ -25,7 +25,7 @@ elif os.getenv('AUTH_TYPE') == 'basic_auth':
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error) -> str:
     """ error not found page """
     return jsonify({"error": "Not found"}), 404
 
