@@ -23,7 +23,11 @@ auth_type = getenv("AUTH_TYPE")
 if auth_type:
     auth_module_path = f"api.v1.auth.{auth_type.lower()}"  # Adapt path based on naming convention
     auth_module = __import__(auth_module_path, fromlist=[auth_type.lower()])
-    auth_manager = getattr(auth_module, auth_type.lower())()  # Instantiate the auth class
+    if auth_type.lower() == "session_auth":
+        auth_manager = getattr(auth_module, auth_type.lower())()  # Instantiate SessionAuth
+    else:
+        # Handle other auth types using existing mechanism (adapt as needed)
+        auth_manager = getattr(auth_module, auth_type.lower())()
 
 @app.errorhandler(404)
 def not_found(error) -> dict:
