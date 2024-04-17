@@ -1,70 +1,70 @@
 #!/usr/bin/env python3
 """
-Route module for the API
+API entry point and request handling
 """
 
 from os import getenv
-from api.v1.views import app_views
-from flask import Flask, jsonify, abort, request
-from flask_cors import CORS, cross_origin
-import os
-from models.user import User
 
+from flask import Flask, jsonify, abort, request
+from flask_cors import (CORS, cross_origin)
 
 app = Flask(__name__)
-app.register_blueprint(app_views)
+
+# Register API blueprints (assuming blueprints reside in a subfolder "api.v1")
+from api.v1 import views  # Assuming views.py holds API endpoints
+
+app.register_blueprint(views.bp)
+
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
-
-auth = None
-
-if os.getenv('AUTH_TYPE') == 'auth':
-    from api.v1.auth.auth import Auth
-    auth = Auth()
-elif os.getenv('AUTH_TYPE') == 'basic_auth':
-    from api.v1.auth.basic_auth import BasicAuth
-    auth = BasicAuth()
-elif os.getenv('AUTH_TYPE') == 'session_auth':
-    from api.v1.auth.session_auth import SessionAuth
-    auth = SessionAuth() 
-
+# Configure authentication based on environment variable
+auth_manager = None
+auth_type = getenv("AUTH_TYPE")
+if auth_type:
+    auth_module_path = f"api.v1.auth.{auth_type.lower()}"  # Adapt path based on naming convention
+    auth_module = __import__(auth_module_path, fromlist=[auth_type.lower()])
+    auth_manager = getattr(auth_module, auth_type.lower())()  # Instantiate the auth class
 
 @app.errorhandler(404)
-def not_found(error) -> str:
-    """ error not found page """
+def not_found(error) -> dict:
+    """ Handles 404 Not Found errors """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(401)
-def unauthorized_error(error) -> str:
-    """ 401 unauthorized page """
+def unauthorized_error(error) -> dict:
+    """ Handles 401 Unauthorized errors """
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
-def forbidden_error(error) -> str:
-    """ 403 page forbidden """
+def forbidden_error(error) -> dict:
+    """ Handles 403 Forbidden errors """
     return jsonify({"error": "Forbidden"}), 403
 
 
 @app.before_request
-def before_request() -> str:
-    """ checks before each request """
-    request_path_list = [
-        '/api/v1/status/',
-        '/api/v1/unauthorized/',
-        '/api/v1/forbidden/']
+def before_request():
+    """ Performs actions before handling each request """
 
-    if auth:
-        if auth.require_auth(request.path, request_path_list):
-            if auth.authorization_header(request) is None:
-                abort(401)
-            if auth.current_user(request) is None:
-                abort(403)
-    
-    # Assign the result of auth.current_user(request) to request.current_user
-    request.current_user = auth.current_user(request)
+    exempt_routes = [
+        "/api/v1/status/",
+        "/api/v1/unauthorized/",
+        "/api/v1/forbidden/",
+        "/api/v1/auth_session/login/",
+    ]
 
+    # Check for authentication if enabled
+    if auth_manager:
+        if auth_manager.requires_auth(request.path, exempt_routes):
+            if not (auth_manager.authorization_header(request) or auth_manager.get_current_user(request)):
+                abort(401)  # Unauthorized
+
+            # Attach user object to request context (adapt method name as needed)
+            request.current_user = auth_manager.get_authenticated_user(request)
+
+            if not request.current_user:
+                abort(403)  # Forbidden
 
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
