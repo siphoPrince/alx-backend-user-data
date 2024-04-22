@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
+"""main code base"""
 
-"""
-Expiration date to session ID
-"""
-from os import getenv
 from datetime import datetime, timedelta, timedelta
+from os import getenv
 from api.v1.auth.session_auth import SessionAuth
 
 
 class SessionExpAuth(SessionAuth):
-    """
-    Session expiration authentification methods
-    """
+    """main session class"""
 
     def __init__(self):
-        """ Initialize class
-        """
+        """init class"""
         try:
             session_duration = int(getenv('SESSION_DURATION'))
         except Exception:
@@ -24,8 +19,7 @@ class SessionExpAuth(SessionAuth):
         self.session_duration = session_duration
 
     def create_session(self, user_id=None):
-        """  Creates a session ID
-        """
+        """session fun"""
         session_id = super().create_session(user_id)
         if session_id is None:
             return None
@@ -36,8 +30,7 @@ class SessionExpAuth(SessionAuth):
         return session_id
 
     def user_id_for_session_id(self, session_id=None):
-        """ Returns a user ID for a given session ID
-        """
+        """ user session """
         if session_id is None:
             return None
         if session_id not in SessionAuth.user_id_by_session_id.keys():

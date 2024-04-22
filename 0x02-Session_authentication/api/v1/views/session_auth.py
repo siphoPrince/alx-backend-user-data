@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""
-Handles all routes for session authentification
-"""
+"""main base code for session authentification"""
 
-from werkzeug import exceptions
 from api.v1.views import app_views
+from werkzeug import exceptions
 from models.user import User
 from flask import jsonify, request
 from os import abort, environ, getenv
@@ -12,14 +10,7 @@ from os import abort, environ, getenv
 
 @app_views.route('/auth_session/login', methods=['POST'], strict_slashes=False)
 def session_login() -> str:
-    """ POST /api/v1/auth/session/login
-        JSON body:
-        - email
-        - password
-    Return:
-      - User instance based on email
-      - 400 if email or password is missing
-    """
+    """ POST if password is missing"""
 
     user_email = request.form.get('email', None)
     user_password = request.form.get('password', None)
@@ -53,11 +44,7 @@ def session_login() -> str:
     methods=['DELETE'],
     strict_slashes=False)
 def session_logout() -> str:
-    """ DELETE /api/v1/auth/session/logout
-    Return:
-      - empty JSON if teh session has been correctly deleted
-      - 404 if logout fails
-    """
+    """ DELET/Logout"""
     from api.v1.app import auth
     if auth.destroy_session(request):
         return jsonify({}), 200

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-"""
-Template for authentication system
-"""
+"""Template for authentication system"""
 
 from flask import request
 from typing import List, TypeVar
@@ -10,16 +8,13 @@ from os import getenv
 
 
 class Auth():
-    """
-    Authentification methods
-    """
+    """ main class codebase"""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """ Returns False
-        """
+        """ requirements"""
         if path is None or excluded_paths is None or not len(excluded_paths):
             return True
-        # Add slash to all cases for consistency
+        
         if path[-1] != '/':
             path += '/'
         if excluded_paths[-1] != '/':
@@ -37,20 +32,17 @@ class Auth():
         return True
 
     def authorization_header(self, request=None) -> str:
-        """ Flask request object
-        """
+        """ sends to header"""
         if request is None or 'Authorization' not in request.headers:
             return None
         return request.headers.get('Authorization')
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """ Flask request object
-        """
+        """ gets current user"""
         return None
 
     def session_cookie(self, request=None):
-        """ Returns a cookie value from a request
-        """
+        """ cookie codebase"""
         if request is None:
             return None
         cookie = getenv('SESSION_NAME')

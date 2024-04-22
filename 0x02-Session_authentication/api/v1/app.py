@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""
-Route module for the API
-"""
+"""making main model for the API"""
+
 from os import getenv
 
-from api.v1.views import app_views
-from flask import Flask, jsonify, abort, request
 from flask_cors import (CORS, cross_origin)
+from flask import Flask, jsonify, abort, request
+from api.v1.views import app_views
+
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
@@ -31,31 +31,27 @@ elif getenv('AUTH_TYPE') == 'session_db_auth':
     auth = SessionDBAuth()
 
 
-@app.errorhandler(404)
-def not_found(error) -> str:
-    """ Not found handler
-    """
-    return jsonify({"error": "Not found"}), 404
-
-
 @app.errorhandler(401)
 def unauthorized_error(error) -> str:
-    """ Unauthorized handler
-    """
+    """handler 404 not found"""
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden_error(error) -> str:
-    """ Forbidden handler
-    """
+    """handler for forbidden"""
     return jsonify({"error": "Forbidden"}), 403
+    
+
+@app.errorhandler(404)
+def not_found(error) -> str:
+    """handler 404 not found"""
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.before_request
 def before_request() -> None:
-    """ Filter each request
-    """
+    """request before"""
     request_path_list = [
         '/api/v1/status/',
         '/api/v1/unauthorized/',
