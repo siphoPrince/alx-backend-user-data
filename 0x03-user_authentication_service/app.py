@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""main app.py"""
+
+
 from flask import Flask, jsonify, request
 from auth import Auth
 
@@ -40,6 +44,6 @@ def get_reset_password_token():
     except ValueError as e:
         return jsonify({"message": str(e)}), 403
 
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
-

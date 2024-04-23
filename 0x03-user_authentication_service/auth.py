@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""main auth.py"""
+
+
 import bcrypt
 import uuid
 from db import DB

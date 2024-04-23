@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""main user.py"""
+
+
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 

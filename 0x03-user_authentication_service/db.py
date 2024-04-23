@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""main file for database"""
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -35,4 +39,3 @@ class DB:
             setattr(user, key, value)
         session.commit()
         session.close()
-
