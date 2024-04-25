@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """main auth.py"""
 
-
 import bcrypt
 import uuid
 from db import DB
@@ -43,4 +42,3 @@ class Auth:
         reset_token = str(uuid.uuid4())
         self._db.update_user(user.id, reset_token=reset_token)
         return reset_token
-
