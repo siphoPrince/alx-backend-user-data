@@ -11,7 +11,7 @@ from sqlalchemy.exc import InvalidRequestError
 from my_user import Base, CustomUser
 
 
-class CustomDB:
+class DB:
     """ Custom Database Class
     """
 
