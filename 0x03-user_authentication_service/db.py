@@ -10,6 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
 from my_user import Base, CustomUser
 
+
 class CustomDB:
     """ Custom Database Class
     """
