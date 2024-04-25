@@ -19,7 +19,7 @@ def welcome() -> str:
     Return:
         Welcome message
     """
-    return jsonify({"message": "Welcome to our custom API"})
+    return jsonify({"message": "Bienvenue"})
 
 
 @app.route('/register', methods=['POST'], strict_slashes=False)
