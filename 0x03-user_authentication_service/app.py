@@ -36,7 +36,7 @@ def register_users():
         user = AUTH.register_user(
             user_data['email'],
             user_data['password'])
-        return jsonify({"email": user.email, "message": "User successfully registered"})
+        return jsonify({"email": user.email, "message": "succes registered"})
     except ValueError:
         return jsonify({"message": "Email is already registered"}), 400
 
@@ -56,7 +56,7 @@ def login():
     is_valid_login = AUTH.valid_login(user_email, user_password)
     if not is_valid_login:
         abort(401)
-    response = jsonify({"email": user_email, "message": "Logged in successfully"})
+    response = jsonify({"email": user_email, "message": "Login successfully"})
     response.set_cookie('session_id', AUTH.create_session(user_email))
     return response
 
