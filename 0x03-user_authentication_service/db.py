@@ -18,10 +18,11 @@ class DB:
     def __init__(self):
         """ Initializes class attributes
         """
-        self._engine = create_engine("sqlite:///custom.db", echo=False)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
+
 
     @property
     def _session(self):
