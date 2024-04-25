@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-""" Custom Database Class for Data Management
+""" Database class to save and update databse
 """
 
 from sqlalchemy import create_engine
@@ -12,39 +12,33 @@ from user import Base, User
 
 
 class DB:
-    """ Custom Database Class
-    """
+    """ main data base class """
 
     def __init__(self):
-        """ Initializes class attributes
-        """
+        """ Init function """
         self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
-
     @property
     def _session(self):
-        """ Private method that returns a session
+        """ returns a session
         """
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str, hashed_password: str) -> CustomUser:
-        """ Save a new user to the database
-        """
-        user = CustomUser(email=email, hashed_password=hashed_password)
+    def add_user(self, email: str, hashed_password: str) -> User:
+        """ adding database """
+        user = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
         self._session.commit()
         return user
 
-    def find_user_by(self, **kwargs) -> CustomUser:
-        """ Returns the first row found in the users table
-            as filtered by the method's input arguments
-        """
+    def find_user_by(self, **kwargs) -> User:
+        """input argument to find user """
         user_keys = [
             'id',
             'email',
@@ -55,15 +49,13 @@ class DB:
         for key in kwargs.keys():
             if key not in user_keys:
                 raise InvalidRequestError
-        result = self._session.query(CustomUser).filter_by(**kwargs).first()
+        result = self._session.query(User).filter_by(**kwargs).first()
         if result is None:
             raise NoResultFound
         return result
 
     def update_user(self, user_id: int, **kwargs) -> None:
-        """ Update user attributes and
-            commit changes to the database
-        """
+        """ updates to the database """
         user_to_update = self.find_user_by(id=user_id)
 
         user_keys = [
