@@ -3,10 +3,8 @@
 """Custom API Implementation
 """
 
-from db import DB
 from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
-from user import User
 
 AUTH = Auth()
 
@@ -130,6 +128,25 @@ def update_password() -> str:
 
     return jsonify(
         {"email": user_email, "message": "Password updated successfully"}), 200
+
+
+@app.route('/users', methods=['POST'], strict_slashes=False)
+def users():
+    """ POST /users
+        JSON body:
+            -email
+            -password
+       return:
+       Register a new user
+    """
+    user_data = request.form
+    try:
+        user = AUTH.register_user(
+            user_data['email'],
+            user_data['password'])
+        return jsonify({"email": user.email, "message": "user created"})
+    except ValueError:
+        return jsonify({"message": "email already registered"}), 400
 
 
 if __name__ == "__main__":
