@@ -8,7 +8,7 @@ from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
 from user import User
 
-AUTH = Authentication()
+AUTH = Auth()
 
 app = Flask(__name__)
 
@@ -33,7 +33,7 @@ def register_users():
     """
     user_data = request.form
     try:
-        user = AUTH.register_new_user(
+        user = AUTH.register_user(
             user_data['email'],
             user_data['password'])
         return jsonify({"email": user.email, "message": "User successfully registered"})
@@ -53,7 +53,7 @@ def login():
 
     user_email = user_data.get('email', '')
     user_password = user_data.get('password', '')
-    is_valid_login = AUTH.validate_login(user_email, user_password)
+    is_valid_login = AUTH.valid_login(user_email, user_password)
     if not is_valid_login:
         abort(401)
     response = jsonify({"email": user_email, "message": "Logged in successfully"})
@@ -100,12 +100,12 @@ def get_reset_password_token_route() -> str:
     """
     user_data = request.form
     user_email = user_data.get('email', '')
-    is_registered = AUTH.check_user_registration(user_email)
+    is_registered = AUTH.create_session(user_email)
 
     if not is_registered:
         abort(403)
 
-    token = AUTH.generate_reset_password_token(user_email)
+    token = AUTH.get_reset_password_token(user_email)
     return jsonify({"email": user_email, "reset_token": token})
 
 
@@ -124,7 +124,7 @@ def update_password() -> str:
     new_password = request.form.get('new_password')
 
     try:
-        AUTH.change_password_with_token(reset_token, new_password)
+        AUTH.update_password(reset_token, new_password)
     except Exception:
         abort(403)
 
