@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-"""Custom API Implementation codebase"""
+"""Custom API Implementation
+"""
 
 from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
@@ -30,8 +31,7 @@ def register_users():
         - password: The password of the user to register.
 
     Returns:
-        - JSON object containing the
-        email of the registered user and a success message.
+        - JSON object containing the email of the registered use.
         - 400 status code if the email is already registered.
     """
     user_data = request.form
@@ -39,7 +39,7 @@ def register_users():
         user = AUTH.register_user(
             user_data['email'],
             user_data['password'])
-        return jsonify({"email": user.email, "message": "Success register."})
+        return jsonify({"email": user.email, "message": "User registered."})
     except ValueError:
         return jsonify({"message": "Email is already registered"}), 400
 
@@ -54,8 +54,7 @@ def login():
         - password: The password of the user.
 
     Returns:
-        - JSON object containing the email of the logged-in user and a succe
-        ss message.
+        - JSON objecemail of the logged-in user and a success message.
         - Sets a session cookie with the session ID.
         - 401 status code if login fails.
     """
@@ -77,7 +76,7 @@ def logout():
     Logs out a user by destroying their session.
 
     Returns:
-        - Redirects the user to the welcome page after successfully loggin
+        - Redirects the user to the logging out.
         - 403 status code if the session ID is invalid.
     """
     session_id = request.cookies.get("session_id", None)
@@ -94,7 +93,7 @@ def profile() -> str:
     Retrieves the profile of the logged-in user.
 
     Returns:
-        - JSON object containing the email of the logged-in user.
+        - JSON object containing the emathe logged-in user.
         - 403 status code if the session ID is invalid.
     """
     session_id = request.cookies.get("session_id", None)
@@ -113,7 +112,7 @@ def get_reset_password_token_route() -> str:
         - email: The email of the user.
 
     Returns:
-        - JSON object containing the email of the user and the reset token.
+        - JSON objecng the email of the user and the reset token.
         - 403 status code if the email is not registered.
     """
     user_data = request.form
@@ -138,7 +137,8 @@ def update_password() -> str:
         - new_password: The new password.
 
     Returns:
-        - JSON object containing the email of the user and a success message.
+        - JSON object containing the
+                email of the user and a success message.
         - 403 status code if the reset token is invalid.
     """
     user_email = request.form.get('email')
@@ -154,28 +154,32 @@ def update_password() -> str:
         {"email": user_email, "message": "Password updated successfully"}), 200
 
 
-@app.route('/users', methods=['POST'], strict_slashes=False)
-def users():
-    """POST /users
-    Registers a new user.
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
+def sessions():
+    """POST /sessions
+    Logs in a user and creates a new session.
 
     JSON body:
-        - email: The email of the user to register.
-        - password: The password of the user to register.
+        - email: The email of the user.
+        - password: The password of the user.
 
     Returns:
-        - JSON object containing th
-        e email of the registered user and a success message.
-        - 400 status code if the email is already registered.
+        - JSON object containing the email
+        of the logged-in user and a success message.
+        - Sets a session cookie with thei session ID.
+        - 401 status code if login fails.
     """
     user_data = request.form
-    try:
-        user = AUTH.register_user(
-            user_data['email'],
-            user_data['password'])
-        return jsonify({"email": user.email, "message": "New user created"})
-    except ValueError:
-        return jsonify({"message": "Email already registered"}), 400
+    user_email = user_data.get('email', '')
+    user_password = user_data.get('password', '')
+
+    is_valid_login = AUTH.valid_login(user_email, user_password)
+    if not is_valid_login:
+        abort(401)
+
+    response = jsonify({"email": user_email, "message": "logged in"})
+    response.set_cookie('session_id', AUTH.create_session(user_email))
+    return response
 
 
 if __name__ == "__main__":
